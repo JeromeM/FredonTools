@@ -1,7 +1,5 @@
 ﻿using System.IO;
-
 using Excel = Microsoft.Office.Interop.Excel;
-
 using SasFredonWPF.Helpers;
 
 namespace SasFredonWPF.Services
