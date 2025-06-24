@@ -1,0 +1,161 @@
+﻿<Window x:Class="SasFredonWPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:local="clr-namespace:SasFredonWPF"
+        mc:Ignorable="d"
+        Title="SAS Fredon" Height="420" Width="902" ResizeMode="NoResize" Icon="/iconefredon.jpg" WindowStartupLocation="CenterScreen" Background="#FFC4DEDE" SizeToContent="WidthAndHeight">
+
+
+    <Grid Background="#FFC4DEDE" MinHeight="420" MaxWidth="900" MaxHeight="420" MinWidth="900" Height="420">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        
+        <!-- Logo + Titre -->
+        <Image Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="100" Margin="21,24,0,0" VerticalAlignment="Top" Width="100" Source="/iconefredon.jpg"/>
+        <Label Content="OUTILS SAS FREDON" Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="92" Margin="245,24,0,0" VerticalAlignment="Top" Width="431" FontSize="55" FontFamily="Impact"/>
+        
+        <!-- Onglets -->
+        <TabControl Grid.ColumnSpan="3" Margin="21,121,27,33">
+            
+            <!-- Facturation -->
+            <TabItem Header="Conversion de Factures" FontSize="16">
+                <Grid Background="#FFB0E0EB">
+                    
+                    <!-- Dossiers -->
+                    <Label Content="Dossier contenant les fichiers Excel :" HorizontalAlignment="Left" Height="26" Margin="14,18,0,0" VerticalAlignment="Top" Width="254" FontSize="14" FontWeight="Bold"/>
+                    <TextBox x:Name="TextBlockExcel" HorizontalAlignment="Left" Height="22" Margin="14,48,0,0" TextWrapping="Wrap" Width="264" FontSize="12" VerticalAlignment="Top"/>
+                    <Button x:Name="ButtonLoadXls" Content="Ouvrir ..." HorizontalAlignment="Left" Height="22" Margin="283,49,0,0" VerticalAlignment="Top" Width="100" FontSize="12" Background="#FF555285" Foreground="White" FontWeight="Bold" Style="{StaticResource HoverButtonStyle}" Click="ButtonLoadXls_Click"/>
+
+                    <Label Content="Dossier de destination pour les PDF :" HorizontalAlignment="Left" Height="30" Margin="14,82,0,0" VerticalAlignment="Top" Width="244" FontSize="14" FontWeight="Bold"/>
+                    <TextBox x:Name="TextBlockPdf" HorizontalAlignment="Left" Height="22" Margin="14,112,0,0" TextWrapping="Wrap" Width="264" FontSize="12" VerticalAlignment="Top"/>
+                    <Button x:Name="ButtonLoadPdf" Content="Ouvrir ..." HorizontalAlignment="Left" Height="22" Margin="283,113,0,0" VerticalAlignment="Top" Width="100" FontSize="12" Background="#FF555285" Foreground="White" FontWeight="Bold" Style="{StaticResource HoverButtonStyle}" Click="ButtonLoadPdf_Click"/>
+
+                    <!-- Hack ligne verticale -->
+                    <Border BorderBrush="Black" BorderThickness="1" Height="150" Margin="421,3,0,0" VerticalAlignment="Top" Width="1" Background="#FF353333" HorizontalAlignment="Left"/>
+
+                    <!-- Options -->
+                    <Label Content="Options :" HorizontalAlignment="Left" Height="30" Margin="454,16,0,0" VerticalAlignment="Top" Width="79" FontSize="14" FontWeight="Bold"/>
+                    <CheckBox x:Name="checkBox_Compress" Content="Compresser les fichiers en un seul ZIP" HorizontalAlignment="Left" Margin="454,49,0,0" VerticalAlignment="Top" FontSize="14" IsChecked="{Binding Options.CompressZipChecked, Mode=TwoWay}"/>
+                    <CheckBox x:Name="checkBox_DeletePDF" Content="Supprimer les fichiers PDF après la compression" HorizontalAlignment="Left" Margin="454,83,0,0" VerticalAlignment="Top" FontSize="14" IsChecked="{Binding Options.DeletePDFChecked, Mode=TwoWay}" IsEnabled="{Binding Options.DeletePDFEnabled}"/>
+                    <CheckBox x:Name="checkBox_ArchiveXLS" Content="Archiver les fichiers XLS après la conversion" HorizontalAlignment="Left" Margin="454,117,0,0" VerticalAlignment="Top" FontSize="14" IsChecked="{Binding Options.ArchiveXLSChecked, Mode=TwoWay}"/>
+
+                    <!-- Conversion -->
+                    <Button x:Name="Button_Conversion" Content="Lancer la conversion" HorizontalAlignment="Center" Height="33" Margin="0,158,0,0" VerticalAlignment="Top" Width="152" FontSize="14" FontWeight="Bold" Background="#FF555285" Foreground="#FFE1E1E1" Style="{StaticResource HoverButtonStyle}" Click="Button_Conversion_Click"/>
+
+                    <!-- Barre de progression + texte à l'interieur -->
+                    <Grid Margin="0">
+                        <ProgressBar x:Name="ProgressBar_Conversion" HorizontalAlignment="Center" Height="26" Margin="0,199,0,0" VerticalAlignment="Top" Width="818" Foreground="#FF4DC095" Background="#FFF0F5FF" BorderBrush="#FF797474" UseLayoutRounding="False"/>
+                        <TextBlock x:Name="ProgressBar_Text" HorizontalAlignment="Center" Foreground="Black" VerticalAlignment="Top" FontSize="12" FontWeight="Bold" Margin="0,204,0,0"/>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            
+            <!-- Frais Kilométriques -->
+            <TabItem Header="Frais Kilométriques" FontSize="16">
+                <Grid Background="#FFB0E0EB">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition Height="8*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Zone d'ajout -->
+                    <Label Content="Frais :" HorizontalAlignment="Left" Margin="22,14,0,0" VerticalAlignment="Top" FontSize="14" Grid.RowSpan="2" FontWeight="Bold"/>
+                    <ComboBox ItemsSource="{Binding Expense.ExpenseTypes}" SelectedItem="{Binding Expense.SelectedType, Mode=TwoWay}" HorizontalAlignment="Left" Margin="75,20,0,191" Width="195" FontSize="12" BorderBrush="White" Background="White" Grid.RowSpan="2"/>
+
+                    <!-- DatePicker -->
+                    <Label Content="Jour :" HorizontalAlignment="Left" Margin="324,15,0,0" VerticalAlignment="Top" FontSize="14" FontWeight="Bold" Height="26" Grid.RowSpan="2"/>
+                    <DatePicker SelectedDate="{Binding Expense.SelectedDate, Mode=TwoWay}" HorizontalAlignment="Left" Margin="379,20,0,0" VerticalAlignment="Top" SelectedDateFormat="Short" Height="23" FontSize="12" IsTodayHighlighted="True" Grid.RowSpan="2" BorderBrush="#FFACACAC" Background="#FFE8E8E8" Width="133">
+                        <DatePicker.Resources>
+                            <Style TargetType="DatePickerTextBox">
+                                <Setter Property="Background" Value="#FFEAEAEA"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="DatePickerTextBox">
+                                            <Border Background="{TemplateBinding Background}">
+                                                <ScrollViewer x:Name="PART_ContentHost" Margin="0" Padding="0" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DatePicker.Resources>
+                    </DatePicker>
+
+                    <!-- Bouton d'ajout -->
+                    <Button Content="Ajouter" HorizontalAlignment="Left" Margin="568,20,0,0" VerticalAlignment="Top" Grid.RowSpan="2" Height="23" Width="111" Background="#FF555285" Foreground="White" FontSize="12" FontWeight="Bold" Style="{StaticResource HoverButtonStyle}" Command="{Binding Expense.AddSelectedExpenseCommand}"/>
+
+                    <!-- Liste des frais -->
+                    <ListView x:Name="ListView_Frais" Grid.Row="1" Margin="22,31,167,10" ItemsSource="{Binding Expense.Lines}" Loaded="ListView_Frais_Loaded" FontSize="16" ItemContainerStyle="{StaticResource CenteredListViewItem}">
+                        <ListView.View>
+                            <GridView AllowsColumnReorder="False">
+
+                                <!-- Jour -->
+                                <GridViewColumn Header="Jour" Width="70" HeaderContainerStyle="{StaticResource CenteredGridViewColumnHeader}">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                                <TextBlock Text="{Binding Day, StringFormat='{}{0:D2}'}" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <!-- Frais -->
+                                <GridViewColumn Header="Frais" Width="470" HeaderContainerStyle="{StaticResource CenteredGridViewColumnHeader}">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="5">
+                                                <TextBlock Text="{Binding ExpenseText}" FontSize="12" TextWrapping="Wrap" Padding="20 0 0 0" HorizontalAlignment="Left" VerticalAlignment="Center" TextAlignment="Left"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <!-- Actions -->
+                                <GridViewColumn Header="Actions" HeaderContainerStyle="{StaticResource CenteredGridViewColumnHeader}">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                                <ItemsControl ItemsSource="{Binding ExpenseByDay}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,0,0,2">
+                                                                <Button Content="✏️" Width="24" Height="24" FontSize="12" ToolTip="Modifier" Background="#FF2F58E1" Foreground="White" BorderThickness="0" Padding="0" FontWeight="Bold" Command="{Binding DataContext.Expense.EditExpenseCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Style="{StaticResource EditButtonHover}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,3,0"/>
+                                                                <Button Content="🗑" Width="24" Height="24" FontSize="12" ToolTip="Supprimer" Command="{Binding DataContext.Expense.DeleteExpenseCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding Id}" Background="#FFFFDDDD" Foreground="#B00020" BorderThickness="0" Padding="0" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </Border>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    
+                    <!-- Boutons pour changer le mois affiché -->
+                    <Button Content="&lt;" Height="26" Margin="690,21,141,0" VerticalAlignment="Top" Style="{StaticResource HoverButtonStyle}" Command="{Binding Expense.PreviousMonthCommand}" Grid.RowSpan="2" Background="#FF555285" Foreground="White" FontWeight="Bold" FontSize="10" />
+                    <Label Content="{Binding Expense.DisplayedMonth}" Margin="705,20,20,0" VerticalAlignment="Top" FontSize="12" HorizontalContentAlignment="Center" Grid.RowSpan="2" Foreground="Black" Height="28" BorderBrush="#FFACACAC" BorderThickness="1,1,1,1" Background="#FFEAEAEA"/>
+                    <Button Content="&gt;" Width="15" Height="26" Margin="826,21,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource HoverButtonStyle}" Command="{Binding Expense.NextMonthCommand}" Grid.RowSpan="2" Background="#FF555285" Foreground="White" FontWeight="Bold" FontSize="10" />
+
+                    <!-- Boutons Export / Imprimer -->
+                    <Button x:Name="Button_Export" Content="Exporter" HorizontalAlignment="Left" Margin="704,61,0,0" Grid.Row="1" VerticalAlignment="Top" Width="120" Height="59" Background="#FF555285" Foreground="White" FontSize="20" FontWeight="Bold" Style="{StaticResource HoverButtonStyle}" Command="{Binding Expense.ExportToExcelCommand}"/>
+                    <Button x:Name="Button_Print" Content="Imprimer" HorizontalAlignment="Left" Margin="704,137,0,0" Grid.Row="1" VerticalAlignment="Top" Width="121" Height="59" Background="#FF555285" Foreground="White" FontSize="20" FontWeight="Bold" Style="{StaticResource HoverButtonStyle}" Command="{Binding Expense.ExportToExcelCommand}" CommandParameter="True"/>
+                    
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</Window>
