@@ -11,8 +11,6 @@ using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using Excel = Microsoft.Office.Interop.Excel;
-using EvoPdf.PdfPrint;
 
 namespace SasFredonWPF.ViewModels
 {
@@ -298,12 +296,12 @@ namespace SasFredonWPF.ViewModels
                         FileInfo tempFile = new(tempFilePath);
                         package.SaveAs(tempFile);
 
-                        Excel.Application excelApp = new()
+                        Microsoft.Office.Interop.Excel.Application excelApp = new()
                         {
-                            Visible = true,
+                            Visible = false,
                         };
-                        Excel.Workbook workbook = excelApp.Workbooks.Open(tempFile.FullName);
-                        Excel.Worksheet worksheetExcel = workbook.Sheets[1];
+                        Microsoft.Office.Interop.Excel.Workbook workbook = excelApp.Workbooks.Open(tempFile.FullName);
+                        Microsoft.Office.Interop.Excel.Worksheet worksheetExcel = workbook.Sheets[1];
 
                         // Mise en page
                         worksheetExcel.PageSetup.FitToPagesWide = 1; // Ajuster à 1 page en largeur
@@ -313,7 +311,19 @@ namespace SasFredonWPF.ViewModels
                         worksheetExcel.PageSetup.TopMargin = excelApp.InchesToPoints(0.25); // Marge haute réduite
                         worksheetExcel.PageSetup.BottomMargin = excelApp.InchesToPoints(0.25); // Marge basse réduite
 
-                        worksheetExcel.PrintPreview();
+                        PrintDialog printDialog = new();
+                        if (printDialog.ShowDialog() == true)
+                        {
+                            worksheetExcel.PrintOut(
+                                From: Type.Missing,
+                                To: Type.Missing,
+                                Copies: 1,
+                                Preview: false,
+                                ActivePrinter: printDialog.PrintQueue.FullName,
+                                PrintToFile: false,
+                                Collate: true
+                            );
+                        }
 
                         workbook.Close(false);
                         excelApp.Quit();
