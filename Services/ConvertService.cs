@@ -1,33 +1,33 @@
 ﻿using System.IO;
-
+using System.Windows;
 using Excel = Microsoft.Office.Interop.Excel;
 
 using SasFredonWPF.Helpers;
 
 namespace SasFredonWPF.Services
 {
-    class ConvertService(MainWindow mainWindow)
+    internal class ConvertService(MainWindow mainWindow)
     {
         private readonly MainWindow _mainWindow = mainWindow;
-        private readonly InterfaceHelper IH = new(mainWindow);
+        private readonly InterfaceHelper _ih = new(mainWindow);
 
         public async Task Convert()
         {
 
-            string sourceFolder = _mainWindow.TextBlockExcel.Text;
-            string destinationFolder = _mainWindow.TextBlockPdf.Text;
+            var sourceFolder = _mainWindow.TextBlockExcel.Text;
+            var destinationFolder = _mainWindow.TextBlockPdf.Text;
 
-            string[] xlsFiles = FileHelper.GetFiles(sourceFolder, "*.xls");
+            var xlsFiles = FileHelper.GetFiles(sourceFolder, "*.xls");
 
             if (xlsFiles.Length == 0)
             {
-                _mainWindow.ProgressBar_Text.Text = "Aucun fichier PDF trouvé";
+                _mainWindow.ProgressBarText.Text = "Aucun fichier PDF trouvé";
                 return;
             }
 
-            _mainWindow.Button_Conversion.IsEnabled = false;
+            _mainWindow.ButtonConversion.IsEnabled = false;
 
-            IH.ResetProgressBar(xlsFiles.Length);
+            _ih.ResetProgressBar(xlsFiles.Length);
 
             await Task.Run(() =>
             {
@@ -41,22 +41,22 @@ namespace SasFredonWPF.Services
 
                 try
                 {
-                    foreach (string xlsFullPath in xlsFiles)
+                    foreach (var xlsFullPath in xlsFiles)
                     {
                         var workbook = excelApp.Workbooks.Open(xlsFullPath);
 
-                        string xlsFilename = Path.GetFileName(xlsFullPath);
-                        string pdfFilename = Path.ChangeExtension(xlsFilename, ".pdf");
-                        string pdfFullPath = Path.Combine(destinationFolder, pdfFilename);
+                        var xlsFilename = Path.GetFileName(xlsFullPath);
+                        var pdfFilename = Path.ChangeExtension(xlsFilename, ".pdf");
+                        var pdfFullPath = Path.Combine(destinationFolder, pdfFilename);
 
                         workbook.ExportAsFixedFormat2(Excel.XlFixedFormatType.xlTypePDF, pdfFullPath, Excel.XlFixedFormatQuality.xlQualityStandard, IncludeDocProperties: true);
 
                         workbook.Close(false);
 
-                        App.Current.Dispatcher.Invoke(() =>
+                        Application.Current.Dispatcher.Invoke(() =>
                         {
-                            IH.UpdateUI();
-                            _mainWindow.ProgressBar_Text.Text = $"Traitement du fichier {xlsFilename}";
+                            _ih.UpdateUi();
+                            _mainWindow.ProgressBarText.Text = $"Traitement du fichier {xlsFilename}";
                         });
 
                         Thread.Sleep(100);
@@ -64,9 +64,9 @@ namespace SasFredonWPF.Services
                 }
                 catch (Exception ex)
                 {
-                    App.Current.Dispatcher.Invoke(() =>
+                    Application.Current.Dispatcher.Invoke(() =>
                     {
-                        _mainWindow.ProgressBar_Text.Text = $"Erreur {ex.Message}";
+                        _mainWindow.ProgressBarText.Text = $"Erreur {ex.Message}";
                     });
                 }
                 finally

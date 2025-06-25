@@ -1,9 +1,10 @@
 ﻿using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media.Animation;
 
 namespace SasFredonWPF.Helpers
 {
-    class InterfaceHelper(MainWindow mainWindow)
+    internal class InterfaceHelper(MainWindow mainWindow)
     {
 
         private readonly MainWindow _mainWindow = mainWindow;
@@ -20,7 +21,7 @@ namespace SasFredonWPF.Helpers
                 Duration = TimeSpan.FromMilliseconds(300),
                 EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
             };
-            _mainWindow.ProgressBar_Conversion.BeginAnimation(ProgressBar.ValueProperty, animation);
+            _mainWindow.ProgressBarConversion.BeginAnimation(RangeBase.ValueProperty, animation);
         }
 
         public void ResetProgressBar(int max)
@@ -28,19 +29,19 @@ namespace SasFredonWPF.Helpers
             _dotCount = 0;
             _currentProgress = 0;
 
-            _mainWindow.ProgressBar_Conversion.BeginAnimation(ProgressBar.ValueProperty, null);
-            _mainWindow.ProgressBar_Conversion.Value = 0;
-            _mainWindow.ProgressBar_Conversion.Maximum = max;
-            _mainWindow.ProgressBar_Text.Text = "";
+            _mainWindow.ProgressBarConversion.BeginAnimation(RangeBase.ValueProperty, null);
+            _mainWindow.ProgressBarConversion.Value = 0;
+            _mainWindow.ProgressBarConversion.Maximum = max;
+            _mainWindow.ProgressBarText.Text = "";
         }
 
-        public void UpdateUI()
+        public void UpdateUi()
         {
             _currentProgress++;
-            AnimateProgressBar(_mainWindow.ProgressBar_Conversion.Value, _currentProgress);
+            AnimateProgressBar(_mainWindow.ProgressBarConversion.Value, _currentProgress);
 
             _dotCount = (_dotCount % 3) + 1;
-            _mainWindow.Button_Conversion.Content = new string('●', _dotCount);
+            _mainWindow.ButtonConversion.Content = new string('●', _dotCount);
         }
 
     }

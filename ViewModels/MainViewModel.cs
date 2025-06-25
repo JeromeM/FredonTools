@@ -5,9 +5,9 @@ namespace SasFredonWPF.ViewModels
     public partial class MainViewModel : ObservableObject
     {
         [ObservableProperty]
-        private OptionsViewModel options = new();
+        private OptionsViewModel _options = new();
 
         [ObservableProperty]
-        private ExpenseViewModel expense = new();
+        private ExpenseViewModel _expense = new();
     }
 }

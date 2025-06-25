@@ -9,10 +9,10 @@ namespace SasFredonWPF.ViewModels
         public ObservableCollection<string> ExpenseTypes { get; }
 
         [ObservableProperty]
-        private string selectedType;
+        private string _selectedType;
 
         [ObservableProperty]
-        private DateTime selectedDate;
+        private DateTime _selectedDate;
 
         public ExpenseEditViewModel(List<string> types, ExpenseModel model)
         {

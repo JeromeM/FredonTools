@@ -13,16 +13,18 @@ namespace SasFredonWPF.Services
             connection.Open();
 
             var cmd = connection.CreateCommand();
-            cmd.CommandText = @"CREATE TABLE IF NOT EXISTS Expense (
-            Id INTEGER PRIMARY KEY AUTOINCREMENT,
-            Date TEXT NOT NULL,
-            Type TEXT NOT NULL
-        )";
+            cmd.CommandText = """
+                              CREATE TABLE IF NOT EXISTS Expense (
+                                          Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                          Date TEXT NOT NULL,
+                                          Type TEXT NOT NULL
+                                      )
+                              """;
 
             cmd.ExecuteNonQuery();
         }
 
-        public List<ExpenseModel> GetMonthExpenses(int year, int month)
+        public static List<ExpenseModel> GetMonthExpenses(int year, int month)
         {
             var expense = new List<ExpenseModel>();
 
@@ -48,7 +50,7 @@ namespace SasFredonWPF.Services
             return expense;
         }
 
-        public void AddExpense(ExpenseModel expense)
+        public static void AddExpense(ExpenseModel expense)
         {
             using var connection = new SqliteConnection(ConnectionString);
             connection.Open();

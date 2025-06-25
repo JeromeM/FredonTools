@@ -12,18 +12,18 @@ namespace SasFredonWPF
     public partial class MainWindow : Window
     {
 
-        private readonly InterfaceHelper IH;
-        private readonly ConvertService C;
-        private readonly FileService S;
+        //private readonly InterfaceHelper _ih;
+        private readonly ConvertService _c;
+        private readonly FileService _s;
 
         // Main Functions
         public MainWindow()
         {
             InitializeComponent();
 
-            IH = new InterfaceHelper(this);
-            C = new ConvertService(this);
-            S = new FileService(this);
+            //_ih = new InterfaceHelper(this);
+            _c = new ConvertService(this);
+            _s = new FileService(this);
 
             DataContext = new MainViewModel();
 
@@ -33,8 +33,8 @@ namespace SasFredonWPF
             if (DataContext is MainViewModel vm)
             {
                 vm.Options.CompressZipChecked = Properties.Settings.Default.CompressZip;
-                vm.Options.DeletePDFChecked = Properties.Settings.Default.DeletePDF;
-                vm.Options.ArchiveXLSChecked = Properties.Settings.Default.ArchiveXLS;
+                vm.Options.DeletePdfChecked = Properties.Settings.Default.DeletePDF;
+                vm.Options.ArchiveXlsChecked = Properties.Settings.Default.ArchiveXLS;
             }
         }
 
@@ -46,8 +46,8 @@ namespace SasFredonWPF
             if (DataContext is MainViewModel vm)
             {
                 Properties.Settings.Default.CompressZip = vm.Options.CompressZipChecked;
-                Properties.Settings.Default.DeletePDF = vm.Options.DeletePDFChecked;
-                Properties.Settings.Default.ArchiveXLS = vm.Options.ArchiveXLSChecked;
+                Properties.Settings.Default.DeletePDF = vm.Options.DeletePdfChecked;
+                Properties.Settings.Default.ArchiveXLS = vm.Options.ArchiveXlsChecked;
             }
 
             Properties.Settings.Default.Save();
@@ -75,46 +75,53 @@ namespace SasFredonWPF
 
         private async void Button_Conversion_Click(object sender, RoutedEventArgs e)
         {
-            await C.Convert();
-
-            if (DataContext is MainViewModel vm)
+            try
             {
-                Debug.Write("OK DATACONTEXT");
-                // Compression
-                if (vm.Options.CompressZipChecked)
-                    await S.CompressFiles();
+                ButtonConversion.IsEnabled = false;
+                ButtonConversion.Content = "Lancement...";
+            
+                await _c.Convert();
 
-                // Delete PDF
-                if (vm.Options.DeletePDFChecked)
-                    await S.DeletePDF();
+                if (DataContext is MainViewModel vm)
+                {
+                    // Compression
+                    if (vm.Options.CompressZipChecked)
+                        await _s.CompressFiles();
 
-                // Delete XLS
-                if (vm.Options.ArchiveXLSChecked)
-                    await S.ArchiveXLS();
+                    // Delete PDF
+                    if (vm.Options.DeletePdfChecked)
+                        await _s.DeletePdf();
+
+                    // Delete XLS
+                    if (vm.Options.ArchiveXlsChecked)
+                        await _s.ArchiveXls();
+                }
+
+                ButtonConversion.IsEnabled = true;
+                ButtonConversion.Content = "Lancer la conversion";
+                ProgressBarText.Text = "TERMINÉ";
             }
-
-            Button_Conversion.IsEnabled = true;
-            Button_Conversion.Content = "Lancer la conversion";
-            ProgressBar_Text.Text = "TERMINÉ";
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Erreur dans la conversion: {ex.Message}");
+            }
         }
 
         ////////////Frais km
         private void ListView_Frais_Loaded(object sender, RoutedEventArgs e)
         {
-            var totalWidth = ListView_Frais.ActualWidth;
-            double compensation = SystemParameters.VerticalScrollBarWidth + 10;
-
             // Somme des largeurs des deux premières colonnes
-            double usedWidth = 70 + 470;
+            const double usedWidth = 70 + 470;
+            
+            var totalWidth = ListViewFrais.ActualWidth;
+            var compensation = SystemParameters.VerticalScrollBarWidth + 10;
 
             // Calcul de la largeur restante
-            double remaining = totalWidth - usedWidth - compensation;
+            var remaining = totalWidth - usedWidth - compensation;
 
-            if (remaining > 0)
-            {
-                var gridView = (GridView)ListView_Frais.View;
-                gridView.Columns[2].Width = remaining;
-            }
+            if (!(remaining > 0)) return;
+            var gridView = (GridView)ListViewFrais.View;
+            gridView.Columns[2].Width = remaining;
         }
 
     }

@@ -3,8 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:System="clr-namespace:System;assembly=mscorlib"
-        xmlns:local="clr-namespace:SasFredonWPF"
         mc:Ignorable="d"
         Title="SAS Fredon" Height="420" Width="902" ResizeMode="NoResize" Icon="/iconefredon.jpg" WindowStartupLocation="CenterScreen" Background="#FFC4DEDE" SizeToContent="WidthAndHeight">
 
@@ -41,17 +39,17 @@
 
                     <!-- Options -->
                     <Label Content="Options :" HorizontalAlignment="Left" Height="30" Margin="454,16,0,0" VerticalAlignment="Top" Width="79" FontSize="14" FontWeight="Bold"/>
-                    <CheckBox x:Name="checkBox_Compress" Content="Compresser les fichiers en un seul ZIP" HorizontalAlignment="Left" Margin="454,49,0,0" VerticalAlignment="Top" FontSize="14" IsChecked="{Binding Options.CompressZipChecked, Mode=TwoWay}"/>
-                    <CheckBox x:Name="checkBox_DeletePDF" Content="Supprimer les fichiers PDF après la compression" HorizontalAlignment="Left" Margin="454,83,0,0" VerticalAlignment="Top" FontSize="14" IsChecked="{Binding Options.DeletePDFChecked, Mode=TwoWay}" IsEnabled="{Binding Options.DeletePDFEnabled}"/>
-                    <CheckBox x:Name="checkBox_ArchiveXLS" Content="Archiver les fichiers XLS après la conversion" HorizontalAlignment="Left" Margin="454,117,0,0" VerticalAlignment="Top" FontSize="14" IsChecked="{Binding Options.ArchiveXLSChecked, Mode=TwoWay}"/>
+                    <CheckBox x:Name="CheckBoxCompress" Content="Compresser les fichiers en un seul ZIP" HorizontalAlignment="Left" Margin="454,49,0,0" VerticalAlignment="Top" FontSize="14" IsChecked="{Binding Options.CompressZipChecked, Mode=TwoWay}"/>
+                    <CheckBox x:Name="CheckBoxDeletePdf" Content="Supprimer les fichiers PDF après la compression" HorizontalAlignment="Left" Margin="454,83,0,0" VerticalAlignment="Top" FontSize="14" IsChecked="{Binding Options.DeletePdfChecked, Mode=TwoWay}" IsEnabled="{Binding Options.DeletePdfEnabled}"/>
+                    <CheckBox x:Name="CheckBoxArchiveXls" Content="Archiver les fichiers XLS après la conversion" HorizontalAlignment="Left" Margin="454,117,0,0" VerticalAlignment="Top" FontSize="14" IsChecked="{Binding Options.ArchiveXlsChecked, Mode=TwoWay}"/>
 
                     <!-- Conversion -->
-                    <Button x:Name="Button_Conversion" Content="Lancer la conversion" HorizontalAlignment="Center" Height="33" Margin="0,158,0,0" VerticalAlignment="Top" Width="152" FontSize="14" FontWeight="Bold" Background="#FF555285" Foreground="#FFE1E1E1" Style="{StaticResource HoverButtonStyle}" Click="Button_Conversion_Click"/>
+                    <Button x:Name="ButtonConversion" Content="Lancer la conversion" HorizontalAlignment="Center" Height="33" Margin="0,158,0,0" VerticalAlignment="Top" Width="152" FontSize="14" FontWeight="Bold" Background="#FF555285" Foreground="#FFE1E1E1" Style="{StaticResource HoverButtonStyle}" Click="Button_Conversion_Click"/>
 
                     <!-- Barre de progression + texte à l'interieur -->
                     <Grid Margin="0">
-                        <ProgressBar x:Name="ProgressBar_Conversion" HorizontalAlignment="Center" Height="26" Margin="0,199,0,0" VerticalAlignment="Top" Width="818" Foreground="#FF4DC095" Background="#FFF0F5FF" BorderBrush="#FF797474" UseLayoutRounding="False"/>
-                        <TextBlock x:Name="ProgressBar_Text" HorizontalAlignment="Center" Foreground="Black" VerticalAlignment="Top" FontSize="12" FontWeight="Bold" Margin="0,204,0,0"/>
+                        <ProgressBar x:Name="ProgressBarConversion" HorizontalAlignment="Center" Height="26" Margin="0,199,0,0" VerticalAlignment="Top" Width="818" Foreground="#FF4DC095" Background="#FFF0F5FF" BorderBrush="#FF797474" UseLayoutRounding="False"/>
+                        <TextBlock x:Name="ProgressBarText" HorizontalAlignment="Center" Foreground="Black" VerticalAlignment="Top" FontSize="12" FontWeight="Bold" Margin="0,204,0,0"/>
                     </Grid>
                 </Grid>
             </TabItem>
@@ -94,7 +92,7 @@
                     <Button Content="Ajouter" HorizontalAlignment="Left" Margin="568,20,0,0" VerticalAlignment="Top" Grid.RowSpan="2" Height="23" Width="111" Background="#FF555285" Foreground="White" FontSize="12" FontWeight="Bold" Style="{StaticResource HoverButtonStyle}" Command="{Binding Expense.AddSelectedExpenseCommand}"/>
 
                     <!-- Liste des frais -->
-                    <ListView x:Name="ListView_Frais" Grid.Row="1" Margin="22,31,167,10" ItemsSource="{Binding Expense.Lines}" Loaded="ListView_Frais_Loaded" FontSize="16" ItemContainerStyle="{StaticResource CenteredListViewItem}">
+                    <ListView x:Name="ListViewFrais" Grid.Row="1" Margin="22,31,167,10" ItemsSource="{Binding Expense.Lines}" Loaded="ListView_Frais_Loaded" FontSize="16" ItemContainerStyle="{StaticResource CenteredListViewItem}">
                         <ListView.View>
                             <GridView AllowsColumnReorder="False">
 
@@ -150,8 +148,8 @@
                     <Button Content="&gt;" Width="15" Height="26" Margin="826,21,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource HoverButtonStyle}" Command="{Binding Expense.NextMonthCommand}" Grid.RowSpan="2" Background="#FF555285" Foreground="White" FontWeight="Bold" FontSize="10" />
 
                     <!-- Boutons Export / Imprimer -->
-                    <Button x:Name="Button_Export" Content="Exporter" HorizontalAlignment="Left" Margin="704,61,0,0" Grid.Row="1" VerticalAlignment="Top" Width="120" Height="59" Background="#FF555285" Foreground="White" FontSize="20" FontWeight="Bold" Style="{StaticResource HoverButtonStyle}" Command="{Binding Expense.ExportToExcelCommand}"/>
-                    <Button x:Name="Button_Print" Content="Imprimer" HorizontalAlignment="Left" Margin="704,137,0,0" Grid.Row="1" VerticalAlignment="Top" Width="121" Height="59" Background="#FF555285" Foreground="White" FontSize="20" FontWeight="Bold" Style="{StaticResource HoverButtonStyle}" Command="{Binding Expense.ExportToExcelCommand}" CommandParameter="True"/>
+                    <Button x:Name="ButtonExport" Content="Exporter" HorizontalAlignment="Left" Margin="704,61,0,0" Grid.Row="1" VerticalAlignment="Top" Width="120" Height="59" Background="#FF555285" Foreground="White" FontSize="20" FontWeight="Bold" Style="{StaticResource HoverButtonStyle}" Command="{Binding Expense.ExportToExcelCommand}"/>
+                    <Button x:Name="ButtonPrint" Content="Imprimer" HorizontalAlignment="Left" Margin="704,137,0,0" Grid.Row="1" VerticalAlignment="Top" Width="121" Height="59" Background="#FF555285" Foreground="White" FontSize="20" FontWeight="Bold" Style="{StaticResource HoverButtonStyle}" Command="{Binding Expense.ExportToExcelCommand}" CommandParameter="True"/>
                     
                 </Grid>
             </TabItem>

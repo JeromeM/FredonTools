@@ -7,22 +7,22 @@ namespace SasFredonWPF.ViewModels
         public DateTime SelectedDate { get; set; } = DateTime.Now;
 
         [ObservableProperty]
-        private bool deletePDFChecked;
+        private bool _deletePdfChecked;
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(DeletePDFEnabled))]
-        private bool compressZipChecked;
+        [NotifyPropertyChangedFor(nameof(DeletePdfEnabled))]
+        private bool _compressZipChecked;
 
         [ObservableProperty]
-        private bool archiveXLSChecked;
+        private bool _archiveXlsChecked;
 
-        public bool DeletePDFEnabled => CompressZipChecked;
+        public bool DeletePdfEnabled => CompressZipChecked;
 
         partial void OnCompressZipCheckedChanged(bool value)
         {
-            if (!value && DeletePDFChecked)
+            if (!value && DeletePdfChecked)
             {
-                DeletePDFChecked = false;
+                DeletePdfChecked = false;
             }
         }
     }

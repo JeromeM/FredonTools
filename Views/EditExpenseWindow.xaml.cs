@@ -5,17 +5,14 @@ using System.Windows;
 namespace SasFredonWPF.Views
 {
     
-    public partial class EditExpenseWindow : Window
+    public partial class EditExpenseWindow
     {
-        public ExpenseModel Expense { get; private set; }
-
-        private ExpenseViewModel _viewModel;
+        public ExpenseModel Expense { get; }
 
         public EditExpenseWindow(ExpenseViewModel viewModel, ExpenseModel expense)
         {
             InitializeComponent();
-
-            _viewModel = viewModel;
+            
             Expense = new ExpenseModel
             {
                 Id = expense.Id,
@@ -28,8 +25,7 @@ namespace SasFredonWPF.Views
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            var vm = DataContext as ExpenseEditViewModel;
-            if (vm is null || string.IsNullOrWhiteSpace(vm.SelectedType))
+            if (DataContext is not ExpenseEditViewModel vm || string.IsNullOrWhiteSpace(vm.SelectedType))
             {
                 MessageBox.Show("Veuillez remplir tous les champs.");
                 return;

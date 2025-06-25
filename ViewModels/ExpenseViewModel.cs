@@ -18,10 +18,17 @@ namespace SasFredonWPF.ViewModels
     {
         private readonly ExpenseDataService _dataService = new();
 
-        [ObservableProperty] private ObservableCollection<ExpenseLineModel> lines;
-        [ObservableProperty] private DateTime selectedDate = DateTime.Today;
-        [ObservableProperty] private string displayedMonth = string.Empty;
-        [ObservableProperty] private string selectedType = "Trajet Zone 1A"; // Valeur par défaut
+        [ObservableProperty]
+        private ObservableCollection<ExpenseLineModel> _lines;
+        
+        [ObservableProperty]
+        private DateTime _selectedDate = DateTime.Today;
+        
+        [ObservableProperty]
+        private string _displayedMonth = string.Empty;
+        
+        [ObservableProperty]
+        private string _selectedType = "Trajet Zone 1A"; // Valeur par défaut
 
         public ObservableCollection<string> ExpenseTypes { get; } =
         [
@@ -46,35 +53,32 @@ namespace SasFredonWPF.ViewModels
 
         private void ExecuteExportToExcel(object? parameter)
         {
-            bool toPrint = false;
-            if (parameter is bool b)
+            var toPrint = parameter switch
             {
-                toPrint = b;
-            }
-            else if (parameter is string s && bool.TryParse(s, out bool parsed))
-            {
-                toPrint = parsed;
-            }
+                bool b => b,
+                string s when bool.TryParse(s, out bool parsed) => parsed,
+                _ => false
+            };
             ExportToExcel(toPrint);
         }
 
         [RelayCommand]
-        public void LoadExpenses()
+        private void LoadExpenses()
         {
             Lines.Clear();
-            int daysInMonth = DateTime.DaysInMonth(SelectedDate.Year, SelectedDate.Month);
+            var daysInMonth = DateTime.DaysInMonth(SelectedDate.Year, SelectedDate.Month);
 
             // Initialiser les lignes vides
-            for (int day = 1; day <= daysInMonth; day++)
+            for (var day = 1; day <= daysInMonth; day++)
             {
                 Lines.Add(new ExpenseLineModel { Day = day });
             }
 
-            var monthExpenses = _dataService.GetMonthExpenses(SelectedDate.Year, SelectedDate.Month);
+            var monthExpenses = ExpenseDataService.GetMonthExpenses(SelectedDate.Year, SelectedDate.Month);
 
             foreach (var expense in monthExpenses)
             {
-                int day = expense.Date.Day;
+                var day = expense.Date.Day;
                 var ligne = Lines.FirstOrDefault(l => l.Day == day);
                 ligne?.ExpenseByDay.Add(expense);
             }
@@ -83,14 +87,14 @@ namespace SasFredonWPF.ViewModels
         }
 
         [RelayCommand]
-        public void NextMonth()
+        private void NextMonth()
         {
             SelectedDate = SelectedDate.AddMonths(1);
             LoadExpenses();
         }
 
         [RelayCommand]
-        public void PreviousMonth()
+        private void PreviousMonth()
         {
             SelectedDate = SelectedDate.AddMonths(-1);
             LoadExpenses();
@@ -106,15 +110,15 @@ namespace SasFredonWPF.ViewModels
             }
         }
 
-        public void AddExpense(DateTime date, string type)
+        private void AddExpense(DateTime date, string type)
         {
             var expense = new ExpenseModel { Date = date, Type = type };
-            _dataService.AddExpense(expense);
+            ExpenseDataService.AddExpense(expense);
             LoadExpenses();
         }
 
         [RelayCommand]
-        public void DeleteExpense(int id)
+        private void DeleteExpense(int id)
         {
             var result = MessageBox.Show(
                 "Voulez-vous vraiment supprimer ce frais ?",
@@ -123,11 +127,9 @@ namespace SasFredonWPF.ViewModels
                 MessageBoxImage.Warning
             );
 
-            if (result == MessageBoxResult.Yes)
-            {
-                _dataService.DeleteExpense(id);
-                LoadExpenses();
-            }
+            if (result != MessageBoxResult.Yes) return;
+            _dataService.DeleteExpense(id);
+            LoadExpenses();
         }
 
         partial void OnSelectedDateChanged(DateTime value)
@@ -143,20 +145,18 @@ namespace SasFredonWPF.ViewModels
                 Owner = Application.Current.MainWindow
             };
 
-            if (window.ShowDialog() == true)
-            {
-                _dataService.UpdateExpense(window.Expense);
-                LoadExpenses();
-            }
+            if (window.ShowDialog() != true) return;
+            _dataService.UpdateExpense(window.Expense);
+            LoadExpenses();
         }
 
-        public void ExportToExcel(bool toPrint = false)
+        private void ExportToExcel(bool toPrint = false)
         {
             // Nombre de jours dans le mois
-            int daysInMonth = DateTime.DaysInMonth(SelectedDate.Year, SelectedDate.Month);
+            var daysInMonth = DateTime.DaysInMonth(SelectedDate.Year, SelectedDate.Month);
 
             // Récupérer les données depuis la base
-            var monthExpenses = _dataService.GetMonthExpenses(SelectedDate.Year, SelectedDate.Month);
+            var monthExpenses = ExpenseDataService.GetMonthExpenses(SelectedDate.Year, SelectedDate.Month);
 
             // Mapping des types de frais vers les colonnes
             var typeToColumnMap = new Dictionary<string, int>
@@ -237,22 +237,22 @@ namespace SasFredonWPF.ViewModels
                 }
 
                 // Bordures du haut
-                for (int col = 1; col <= 8; col++) // Colonnes A à H
+                for (var col = 1; col <= 8; col++) // Colonnes A à H
                 {
                     using var range = worksheet.Cells[11, col, 12, col];
                     range.Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
                 }
 
                 // Ajout des jours du mois
-                for (int day = 1; day <= daysInMonth; day++)
+                for (var day = 1; day <= daysInMonth; day++)
                 {
-                    int currentRow = day + 12; // +12 = nombre de lignes avant le premier jour
+                    var currentRow = day + 12; // +12 = nombre de lignes avant le premier jour
                     var ws = worksheet.Cells[$"A{currentRow}"];
                     ws.Value = day;
                     ws.Style.Font.Bold = true;
                     ws.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
 
-                    for (int col = 1; col <= 8; col++)
+                    for (var col = 1; col <= 8; col++)
                     {
                         worksheet.Cells[currentRow, col].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
                     }
@@ -262,37 +262,33 @@ namespace SasFredonWPF.ViewModels
 
                     foreach (var expense in dayExpenses)
                     {
-                        if (typeToColumnMap.TryGetValue(expense.Type, out int columnIndex))
-                        {
-                            worksheet.Cells[currentRow, columnIndex].Value = 1;
-                            worksheet.Cells[currentRow, columnIndex].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                        }
+                        if (!typeToColumnMap.TryGetValue(expense.Type, out var columnIndex)) continue;
+                        worksheet.Cells[currentRow, columnIndex].Value = 1;
+                        worksheet.Cells[currentRow, columnIndex].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
                     }
                 }
 
                 // Totaux
-                int totalRowIndex = 45;
+                const int totalRowIndex = 45;
                 worksheet.Cells[$"A{totalRowIndex}"].Value = "TOTAL";
                 worksheet.Cells[$"A{totalRowIndex}"].Style.Font.Bold = true;
-                for (int col = 1; col <= 8; col++)
+                for (var col = 1; col <= 8; col++)
                 {
                     worksheet.Cells[totalRowIndex, col].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
                     worksheet.Cells[totalRowIndex, col].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
 
-                    if (col >= 2)
-                    {
-                        var currentCol = colIntToName[col];
-                        int fromRow = 13;
-                        int toRow = fromRow + daysInMonth;
-                        worksheet.Cells[totalRowIndex, col].Formula = $"SUM({currentCol}{fromRow}:{currentCol}{toRow})";
-                    }
+                    if (col < 2) continue;
+                    var currentCol = colIntToName[col];
+                    const int fromRow = 13;
+                    var toRow = fromRow + daysInMonth;
+                    worksheet.Cells[totalRowIndex, col].Formula = $"SUM({currentCol}{fromRow}:{currentCol}{toRow})";
                 }
 
-                if (toPrint == true)
+                if (toPrint)
                 {
                     try
                     {
-                        string tempFilePath = Path.Combine(Path.GetTempPath(), $"Frais_{DisplayedMonth.Replace(" ", "_")}_{Guid.NewGuid()}.xlsx");
+                        var tempFilePath = Path.Combine(Path.GetTempPath(), $"Frais_{DisplayedMonth.Replace(" ", "_")}_{Guid.NewGuid()}.xlsx");
                         FileInfo tempFile = new(tempFilePath);
                         package.SaveAs(tempFile);
 
@@ -300,7 +296,7 @@ namespace SasFredonWPF.ViewModels
                         {
                             Visible = false,
                         };
-                        Microsoft.Office.Interop.Excel.Workbook workbook = excelApp.Workbooks.Open(tempFile.FullName);
+                        var workbook = excelApp.Workbooks.Open(tempFile.FullName);
                         Microsoft.Office.Interop.Excel.Worksheet worksheetExcel = workbook.Sheets[1];
 
                         // Mise en page
@@ -352,14 +348,12 @@ namespace SasFredonWPF.ViewModels
                         DefaultExt = ".xlsx"
                     };
 
-                    if (saveFileDialog.ShowDialog() == true)
-                    {
-                        // Sauvegarder le fichier
-                        FileInfo fileInfo = new(saveFileDialog.FileName);
-                        package.SaveAs(fileInfo);
+                    if (saveFileDialog.ShowDialog() != true) return;
+                    // Sauvegarder le fichier
+                    FileInfo fileInfo = new(saveFileDialog.FileName);
+                    package.SaveAs(fileInfo);
 
-                        MessageBox.Show($"Fichier {fileInfo.FullName} exporté avec succès");
-                    }
+                    MessageBox.Show($"Fichier {fileInfo.FullName} exporté avec succès");
                 }
                     
             }
