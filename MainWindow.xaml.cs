@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using SasFredonWPF.Helpers;
 using SasFredonWPF.Services;
 using SasFredonWPF.ViewModels;
+using System.Diagnostics;
 
 namespace SasFredonWPF
 {
@@ -29,11 +30,11 @@ namespace SasFredonWPF
             TextBlockExcel.Text = Properties.Settings.Default.TextExcelPath;
             TextBlockPdf.Text = Properties.Settings.Default.TextPdfPath;
 
-            if (DataContext is OptionsViewModel vm)
+            if (DataContext is MainViewModel vm)
             {
-                vm.CompressZipChecked = Properties.Settings.Default.CompressZip;
-                vm.DeletePDFChecked = Properties.Settings.Default.DeletePDF;
-                vm.ArchiveXLSChecked = Properties.Settings.Default.ArchiveXLS;
+                vm.Options.CompressZipChecked = Properties.Settings.Default.CompressZip;
+                vm.Options.DeletePDFChecked = Properties.Settings.Default.DeletePDF;
+                vm.Options.ArchiveXLSChecked = Properties.Settings.Default.ArchiveXLS;
             }
         }
 
@@ -42,11 +43,11 @@ namespace SasFredonWPF
             Properties.Settings.Default.TextExcelPath = TextBlockExcel.Text;
             Properties.Settings.Default.TextPdfPath = TextBlockPdf.Text;
 
-            if (DataContext is OptionsViewModel vm)
+            if (DataContext is MainViewModel vm)
             {
-                Properties.Settings.Default.CompressZip = vm.CompressZipChecked;
-                Properties.Settings.Default.DeletePDF = vm.DeletePDFChecked;
-                Properties.Settings.Default.ArchiveXLS = vm.ArchiveXLSChecked;
+                Properties.Settings.Default.CompressZip = vm.Options.CompressZipChecked;
+                Properties.Settings.Default.DeletePDF = vm.Options.DeletePDFChecked;
+                Properties.Settings.Default.ArchiveXLS = vm.Options.ArchiveXLSChecked;
             }
 
             Properties.Settings.Default.Save();
@@ -76,18 +77,19 @@ namespace SasFredonWPF
         {
             await C.Convert();
 
-            if (DataContext is OptionsViewModel vm)
+            if (DataContext is MainViewModel vm)
             {
+                Debug.Write("OK DATACONTEXT");
                 // Compression
-                if (vm.CompressZipChecked)
+                if (vm.Options.CompressZipChecked)
                     await S.CompressFiles();
 
                 // Delete PDF
-                if (vm.DeletePDFChecked)
+                if (vm.Options.DeletePDFChecked)
                     await S.DeletePDF();
 
                 // Delete XLS
-                if (vm.ArchiveXLSChecked)
+                if (vm.Options.ArchiveXLSChecked)
                     await S.ArchiveXLS();
             }
 
